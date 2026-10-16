@@ -158,7 +158,7 @@
       const glow = d.createElement('div');
       glow.className = 'sunlight';
       glow.setAttribute('aria-hidden', 'true');
-      glow.innerHTML = '<svg viewBox="10 4 248 160" focusable="false"><use href="/assets/img/sprite.svg#sun"></use></svg>';
+      glow.innerHTML = '<svg viewBox="10 4 248 160" aria-hidden="true" focusable="false"><use href="/assets/img/sprite.svg#sun"></use></svg>';
       zone.prepend(glow);
       // Anchor the center of the sun disc (not the box) on the pointer
       gsap.set(glow, { xPercent: -49.6, yPercent: -74, transformOrigin: '49.6% 74%', scale: 0.7 });

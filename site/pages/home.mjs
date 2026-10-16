@@ -30,7 +30,7 @@ export default function home() {
         ${picture('hero-care', 'A caregiver checks on an older man resting comfortably in bed at home', { sizes: '(min-width: 960px) 40vw, 86vw', priority: true })}
       </div>
       <div class="hero__badge" aria-hidden="true" data-hero-in>
-        <svg class="badge-ring" viewBox="0 0 200 200" data-badge-ring><defs><path id="badge-circle" d="M100 100m-80 0a80 80 0 1 1 160 0a80 80 0 1 1-160 0"/></defs><text><textPath href="#badge-circle" textLength="500" lengthAdjust="spacing">Illuminate Home Health ✦ Los Angeles ✦</textPath></text></svg>
+        <svg class="badge-ring" viewBox="0 0 200 200" aria-hidden="true" focusable="false" data-badge-ring><defs><path id="badge-circle" d="M100 100m-80 0a80 80 0 1 1 160 0a80 80 0 1 1-160 0"/></defs><text><textPath href="#badge-circle" textLength="500" lengthAdjust="spacing">Illuminate Home Health ✦ Los Angeles ✦</textPath></text></svg>
         ${sun()}
       </div>
     </div>

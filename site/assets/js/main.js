@@ -163,17 +163,19 @@
     });
   }
 
+  // The real number stays in the HTML (for search engines and screen readers);
+  // it only counts up from zero once the stat scrolls into view.
   function counters() {
     $$('[data-count]').forEach((el) => {
       const end = Number(el.dataset.count);
-      const obj = { v: 0 };
-      el.textContent = '0';
-      gsap.to(obj, {
-        v: end,
-        duration: 2.2,
-        ease: 'expo.out',
-        scrollTrigger: { trigger: el, start: 'top 90%', once: true },
-        onUpdate: () => (el.textContent = String(Math.round(obj.v))),
+      ScrollTrigger.create({
+        trigger: el,
+        start: 'top 92%',
+        once: true,
+        onEnter: () => {
+          const obj = { v: 0 };
+          gsap.to(obj, { v: end, duration: 2.2, ease: 'expo.out', onUpdate: () => (el.textContent = String(Math.round(obj.v))) });
+        },
       });
     });
   }

@@ -56,7 +56,9 @@ npm run check     # house rules + SEO/accessibility checks on the build
 GitHub (main) ──push──▶ Cloudflare Workers Builds ──npm run build──▶ npx wrangler deploy
 ```
 
-The Cloudflare project is the Worker **`illuminate-homehealth`**, connected to this repository. Every push to `main` builds the site into `dist/` and deploys it. Configuration is in `wrangler.jsonc`:
+The Cloudflare project is the Worker **`illuminate-homehealth`**, connected to this repository through Workers Builds (trigger "Production (main)"). Every push to `main` builds the site into `dist/` and deploys it. Until the custom domain is attached, the site is live at **https://illuminate-homehealth.henrymm.workers.dev**.
+
+To redeploy another branch by hand: Cloudflare dashboard → Workers → illuminate-homehealth → Deployments (or Builds) → run a build and pick the branch. Configuration is in `wrangler.jsonc`:
 
 - `dist/` is served by Workers Static Assets.
 - `src/worker.js` runs first on every request to send `illuminatehomehealth.com` to `www.illuminatehomehealth.com`, handle `POST /api/contact`, and add security headers (CSP, HSTS, frame protection and more).
@@ -66,12 +68,25 @@ The Cloudflare project is the Worker **`illuminate-homehealth`**, connected to t
 
 The domain stays registered at GoDaddy. Only the DNS moves to Cloudflare.
 
-1. **Cloudflare dashboard → Add a domain →** `illuminatehomehealth.com` (Free plan). Cloudflare copies the existing DNS records.
-2. **Before switching anything,** compare the copied records with GoDaddy's DNS page and make sure the email records came over: every `MX` record, the SPF `TXT` record (`v=spf1 ...`), any DKIM and DMARC records. Email for `contact@illuminatehomehealth.com` depends on them.
-3. **GoDaddy → My Products → illuminatehomehealth.com → DNS → Nameservers → Change → "I'll use my own nameservers"** and enter the two nameservers Cloudflare shows (for this account they are `kira.ns.cloudflare.com` and `viddy.ns.cloudflare.com`).
-4. Wait for Cloudflare to show the domain as **Active** (usually under an hour, sometimes up to 24).
-5. **Go live:** in `wrangler.jsonc`, uncomment the `routes` block for `www.illuminatehomehealth.com` and `illuminatehomehealth.com` and push to `main`. (Or Cloudflare dashboard → Workers → illuminate-homehealth → Settings → Domains → Add custom domain, for both names.) Cloudflare replaces the old Webflow `A`/`CNAME` records for those two names and issues the SSL certificate automatically.
-6. Once the new site is live, unpublish the Webflow site and remove its custom domain.
+`illuminatehomehealth.com` has already been added to the Cloudflare account (status: pending) with every current record copied over:
+
+| Record | Points to | Notes |
+| --- | --- | --- |
+| `A` @ (×2) and `CNAME` www | Webflow | DNS only, so the old site keeps working until go live |
+| `MX` @ (×5) | Google Workspace | Clinic email |
+| `TXT` @ | `v=spf1 include:dc-aa8e722993._spfm... include:_spf.paubox.com -all` | SPF |
+| `TXT` `dc-aa8e722993._spfm` | `v=spf1 include:_spf.google.com include:_spf.paubox.com ~all` | Added by hand: Cloudflare's scan can't see it, and SPF fails without it |
+| `TXT` `paubox._domainkey` | Paubox DKIM key | Added by hand for the same reason (Paubox HIPAA email) |
+| `TXT` @ and `_webflow` | Google and Webflow verification | |
+| `CNAME` `pay`, `_domainconnect` | GoDaddy | |
+
+Steps to switch:
+
+1. **Double check** Cloudflare → illuminatehomehealth.com → DNS → Records against GoDaddy's DNS page. If GoDaddy shows any record not in the table above (for example a DMARC `_dmarc` record or another DKIM key added later), add it in Cloudflare first.
+2. **GoDaddy → My Products → illuminatehomehealth.com → DNS → Nameservers → Change → "I'll use my own nameservers"** and enter `kira.ns.cloudflare.com` and `viddy.ns.cloudflare.com`.
+3. Wait for Cloudflare to show the domain as **Active** (usually under an hour, sometimes up to 24). The Webflow site and email keep working the whole time.
+4. **Go live:** in `wrangler.jsonc`, uncomment the `routes` block for `www.illuminatehomehealth.com` and `illuminatehomehealth.com` and push to `main`. (Or Cloudflare dashboard → Workers → illuminate-homehealth → Settings → Domains → Add custom domain, for both names; remove the old Webflow `A` and `www` records if Cloudflare asks.) SSL certificates are issued automatically.
+5. Once the new site is live, unpublish the Webflow site and remove its custom domain.
 
 ## Contact form email (Resend)
 

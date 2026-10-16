@@ -17,6 +17,7 @@
   initMenu();
   initFaq();
   initForm();
+  rollingLabels();
 
   const gsap = window.gsap;
   if (!gsap || !window.ScrollTrigger || !window.SplitText) {
@@ -45,12 +46,13 @@
       counters();
       parallax();
       clipReveals();
-      marquees();
+      const undoMarquee = marquees();
       stack();
       band();
       drift();
       footerWord();
       reveals();
+      return () => undoMarquee && undoMarquee();
     });
 
     mm.add('(prefers-reduced-motion: no-preference) and (min-width: 900px)', () => {
@@ -69,7 +71,18 @@
     mm.add('(prefers-reduced-motion: no-preference) and (hover: hover) and (pointer: fine)', () => {
       magnetic();
       hoverPreview();
+      const undoLight = sunlight();
+      const undoTilt = heroTilt();
+      return () => {
+        undoLight && undoLight();
+        undoTilt && undoTilt();
+      };
     });
+
+    // Triggers are created per feature, not in page order: sort them by position
+    // (pins first) and measure again so everything below a pinned section lines up.
+    ScrollTrigger.sort();
+    ScrollTrigger.refresh();
 
     // Lazy images and late layout changes
     addEventListener('load', () => ScrollTrigger.refresh(), { once: true });
@@ -81,32 +94,101 @@
     const hero = $('[data-hero]');
     if (!hero) return;
     const title = $('[data-hero-title]', hero);
-    const arch = $('[data-hero-arch]', hero);
-    const img = $('img', arch);
-    const mark = $('[data-hero-mark]', hero);
-    const rays = $$('.ray', mark);
-    const core = $('.sun-core', mark);
-    const origin = '132.9 122.7';
+    const media = $('[data-hero-media]', hero);
+    const img = $('img', media);
 
     const split = SplitText.create(title, { type: 'lines', mask: 'lines', linesClass: 'ln' });
     gsap.set(title, { opacity: 1 });
     gsap.set('[data-hero-in]', { y: 28 });
 
+    // The photo rises into view like the sun: a circle opening from the bottom edge
     const tl = gsap.timeline({ defaults: { ease: 'expo.out' } });
-    tl.from(split.lines, { yPercent: 115, duration: 1.5, stagger: 0.12 }, 0.15)
-      .fromTo(arch, { clipPath: 'inset(100% 0% 0% 0%)' }, { clipPath: 'inset(0% 0% 0% 0%)', duration: 1.6, ease: 'expo.inOut' }, 0)
-      .from(img, { scale: 1.4, duration: 2.4 }, 0)
-      .from(core, { y: 70, scale: 0.5, svgOrigin: origin, duration: 1.8 }, 0.45)
-      .from(rays, { scale: 0, svgOrigin: origin, duration: 1.3, stagger: { each: 0.08, from: 'center' }, ease: 'back.out(1.7)' }, 0.75)
+    tl.from(split.lines, { yPercent: 115, filter: 'blur(14px)', duration: 1.6, stagger: 0.13 }, 0.15)
+      .fromTo(media, { clipPath: 'circle(0% at 50% 100%)' }, { clipPath: 'circle(150% at 50% 100%)', duration: 2, ease: 'expo.inOut', clearProps: 'clipPath' }, 0)
+      .from(img, { scale: 1.5, duration: 2.8 }, 0)
+      .from('.hero__badge', { scale: 0, rotation: -120, duration: 1.6, ease: 'back.out(1.6)' }, 0.9)
       .to('[data-hero-in]', { opacity: 1, y: 0, duration: 1.3, stagger: 0.09 }, 0.55);
 
     const scrub = { trigger: hero, start: 'top top', end: 'bottom top', scrub: true };
-    gsap.to($('.hero-rays', mark), { rotation: 40, svgOrigin: origin, ease: 'none', scrollTrigger: scrub });
-    gsap.to(mark, { yPercent: 18, ease: 'none', scrollTrigger: scrub });
-    gsap.to(arch, { yPercent: -10, ease: 'none', scrollTrigger: scrub });
+    gsap.to(media, { yPercent: -10, ease: 'none', scrollTrigger: scrub });
+    gsap.to($('picture', media), { scale: 1.14, ease: 'none', scrollTrigger: scrub });
     gsap.to('[data-hero-glow]', { yPercent: 30, scale: 1.2, ease: 'none', scrollTrigger: scrub });
     gsap.to('.hero__copy', { yPercent: -12, ease: 'none', scrollTrigger: scrub });
-    gsap.to('[data-badge-ring]', { rotation: 220, transformOrigin: '50% 50%', ease: 'none', scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom top', scrub: true } });
+    gsap.to('[data-badge-ring]', { rotation: 220, transformOrigin: '50% 50%', ease: 'none', scrollTrigger: scrub });
+  }
+
+  // Pointer moves tilt the hero photo in 3D while the badge floats the other way
+  function heroTilt() {
+    const hero = $('[data-hero]');
+    if (!hero) return null;
+    const media = $('[data-hero-media]', hero);
+    const badge = $('.hero__badge', hero);
+    const rx = gsap.quickTo(media, 'rotationX', { duration: 1, ease: 'expo.out' });
+    const ry = gsap.quickTo(media, 'rotationY', { duration: 1, ease: 'expo.out' });
+    const bx = gsap.quickTo(badge, 'xPercent', { duration: 1.2, ease: 'expo.out' });
+    const by = gsap.quickTo(badge, 'yPercent', { duration: 1.2, ease: 'expo.out' });
+    const move = (e) => {
+      const r = hero.getBoundingClientRect();
+      const px = (e.clientX - r.left) / r.width - 0.5;
+      const py = (e.clientY - r.top) / r.height - 0.5;
+      ry(px * 12);
+      rx(py * -9);
+      bx(px * -28);
+      by(py * -28);
+    };
+    const leave = () => {
+      rx(0);
+      ry(0);
+      bx(0);
+      by(0);
+    };
+    hero.addEventListener('pointermove', move);
+    hero.addEventListener('pointerleave', leave);
+    return () => {
+      hero.removeEventListener('pointermove', move);
+      hero.removeEventListener('pointerleave', leave);
+    };
+  }
+
+  // A warm pool of light follows the pointer across the hero and the call to action panels
+  function sunlight() {
+    const undo = [];
+    $$('[data-sunlight]').forEach((zone) => {
+      const glow = d.createElement('div');
+      glow.className = 'sunlight';
+      glow.setAttribute('aria-hidden', 'true');
+      zone.prepend(glow);
+      gsap.set(glow, { xPercent: -50, yPercent: -50 });
+      const x = gsap.quickTo(glow, 'x', { duration: 1.1, ease: 'expo.out' });
+      const y = gsap.quickTo(glow, 'y', { duration: 1.1, ease: 'expo.out' });
+      const pos = (e) => {
+        const r = zone.getBoundingClientRect();
+        return [e.clientX - r.left, e.clientY - r.top];
+      };
+      const enter = (e) => {
+        const [px, py] = pos(e);
+        gsap.set(glow, { x: px, y: py });
+        x(px);
+        y(py);
+        gsap.to(glow, { opacity: 1, duration: 0.9, overwrite: 'auto' });
+      };
+      const move = (e) => {
+        const [px, py] = pos(e);
+        x(px);
+        y(py);
+      };
+      const leave = () => gsap.to(glow, { opacity: 0, duration: 1.2, overwrite: 'auto' });
+      zone.addEventListener('pointerenter', enter);
+      zone.addEventListener('pointermove', move);
+      zone.addEventListener('pointerleave', leave);
+      undo.push(() => {
+        zone.removeEventListener('pointerenter', enter);
+        zone.removeEventListener('pointermove', move);
+        zone.removeEventListener('pointerleave', leave);
+        glow.remove();
+      });
+    });
+    return () => undo.forEach((f) => f());
   }
 
   function pageHero() {
@@ -114,7 +196,7 @@
     if (!title) return;
     const split = SplitText.create(title, { type: 'lines', mask: 'lines', linesClass: 'ln' });
     gsap.set(title, { opacity: 1 });
-    gsap.from(split.lines, { yPercent: 115, duration: 1.4, stagger: 0.12, ease: 'expo.out', delay: 0.1 });
+    gsap.from(split.lines, { yPercent: 115, filter: 'blur(12px)', duration: 1.5, stagger: 0.12, ease: 'expo.out', delay: 0.1 });
     const sun = $('[data-hero-sun]');
     if (sun) {
       gsap.from(sun, { rotation: -40, scale: 0.6, opacity: 0, duration: 2, ease: 'expo.out', delay: 0.2 });
@@ -136,6 +218,7 @@
         onSplit: (self) =>
           gsap.from(self.lines, {
             yPercent: 115,
+            filter: 'blur(10px)',
             duration: 1.3,
             stagger: 0.1,
             ease: 'expo.out',
@@ -204,7 +287,8 @@
       const img = $('img', el);
       gsap.set(el, { opacity: 1 });
       const tl = gsap.timeline({ scrollTrigger: { trigger: el, start: 'top 88%', once: true } });
-      tl.fromTo(el, { clipPath: 'inset(100% 0% 0% 0%)' }, { clipPath: 'inset(0% 0% 0% 0%)', duration: 1.5, ease: 'expo.inOut' });
+      // Photos open like a sunrise: a circle growing up from the bottom edge
+      tl.fromTo(el, { clipPath: 'circle(0% at 50% 100%)' }, { clipPath: 'circle(150% at 50% 100%)', duration: 1.7, ease: 'expo.inOut', clearProps: 'clipPath' });
       if (img) tl.from(img, { scale: 1.35, duration: 2.2, ease: 'expo.out' }, 0);
       if (img) gsap.to(img, { yPercent: 6, ease: 'none', scrollTrigger: { trigger: el, start: 'top bottom', end: 'bottom top', scrub: true } });
     });
@@ -251,6 +335,8 @@
         pin: true,
         scrub: true,
         invalidateOnRefresh: true,
+        // Pinned sections add scroll space, so measure them before everything below them
+        refreshPriority: 2,
         onUpdate: (self) => {
           if (bar) bar.style.transform = `scaleX(${0.06 + self.progress * 0.94})`;
           if (count) {
@@ -258,6 +344,24 @@
             count.textContent = String(Math.min(i + 1, items.length - 1)).padStart(2, '0');
           }
         },
+      },
+    });
+
+    // Cards lean into the direction of travel when you scroll fast, then settle
+    const cards = $$('.svc-card, .svc-end', track);
+    const setSkew = gsap.quickSetter(cards, 'skewX', 'deg');
+    const lean = { v: 0 };
+    const clampLean = gsap.utils.clamp(-7, 7);
+    ScrollTrigger.create({
+      trigger: pin,
+      start: () => tween.scrollTrigger.start,
+      end: () => tween.scrollTrigger.end,
+      onUpdate: (self) => {
+        const v = clampLean(self.getVelocity() / -260);
+        if (Math.abs(v) > Math.abs(lean.v)) {
+          lean.v = v;
+          gsap.to(lean, { v: 0, duration: 0.9, ease: 'power3.out', overwrite: true, onUpdate: () => setSkew(lean.v) });
+        }
       },
     });
 
@@ -287,16 +391,66 @@
     };
   }
 
-  // Big words slide in opposite directions, driven by scroll
+  // Big words run like a ticker, but only when you scroll: scroll down and the rows
+  // travel in opposite directions, scroll up and they reverse. Faster scrolling
+  // pushes them harder and leans the letters; they glide to a stop when you do.
+  // (No motion without scrolling, so nothing moves on its own.)
   function marquees() {
-    $$('[data-marquee]').forEach((row) => {
-      const dir = Number(row.dataset.marquee);
-      gsap.fromTo(
-        row,
-        { xPercent: dir > 0 ? -50 : 0 },
-        { xPercent: dir > 0 ? -12 : -38, ease: 'none', scrollTrigger: { trigger: row.parentElement, start: 'top bottom', end: 'bottom top', scrub: true } },
-      );
+    const rows = $$('[data-marquee]');
+    if (!rows.length) return null;
+    const section = rows[0].parentElement;
+    const items = rows.map((row) => ({
+      row,
+      dir: Number(row.dataset.marquee) || 1,
+      x: 0,
+      half: 1,
+      setX: gsap.quickSetter(row, 'x', 'px'),
+      setSkew: gsap.quickSetter(row, 'skewX', 'deg'),
+    }));
+    const measure = () => items.forEach((it) => (it.half = Math.max(1, it.row.scrollWidth / 2)));
+    measure();
+    items.forEach((it, i) => {
+      it.x = i % 2 ? -it.half * 0.5 : 0;
+      it.setX(it.x);
     });
+
+    let lastY = scrollY;
+    let vel = 0;
+    let active = false;
+    const clampSkew = gsap.utils.clamp(-12, 12);
+    const tick = () => {
+      const y = scrollY;
+      const dy = y - lastY;
+      lastY = y;
+      vel += (dy - vel) * 0.12;
+      if (Math.abs(vel) < 0.01) vel = 0;
+      if (!active || (!vel && !dy)) return;
+      const skew = clampSkew(vel * -0.35);
+      items.forEach((it) => {
+        it.x -= it.dir * vel * 1.6;
+        if (it.x <= -it.half) it.x += it.half;
+        if (it.x > 0) it.x -= it.half;
+        it.setX(it.x);
+        it.setSkew(skew * it.dir);
+      });
+    };
+    const st = ScrollTrigger.create({
+      trigger: section,
+      start: 'top bottom',
+      end: 'bottom top',
+      onToggle: (self) => {
+        active = self.isActive;
+        lastY = scrollY;
+      },
+    });
+    gsap.ticker.add(tick);
+    ScrollTrigger.addEventListener('refresh', measure);
+    return () => {
+      gsap.ticker.remove(tick);
+      ScrollTrigger.removeEventListener('refresh', measure);
+      st.kill();
+      gsap.set(rows, { clearProps: 'transform' });
+    };
   }
 
   // Testimonials glide sideways while the section scrolls past
@@ -321,8 +475,8 @@
         if (!next) return;
         gsap.fromTo(
           card,
-          { scale: 1, filter: 'brightness(1)' },
-          { scale: 0.92, filter: 'brightness(0.95)', ease: 'none', scrollTrigger: { trigger: next, start: 'top bottom', end: 'top 30%', scrub: true } },
+          { scale: 1, rotationX: 0, filter: 'brightness(1)' },
+          { scale: 0.9, rotationX: 9, transformPerspective: 1400, filter: 'brightness(0.95)', ease: 'none', scrollTrigger: { trigger: next, start: 'top bottom', end: 'top 30%', scrub: true } },
         );
       });
     });
@@ -342,7 +496,7 @@
     gsap.set(steps[0], { opacity: 1, y: 0 });
 
     const tl = gsap.timeline({
-      scrollTrigger: { trigger: section, start: 'top top', end: () => `+=${steps.length * 0.75 * innerHeight}`, pin: true, scrub: true, invalidateOnRefresh: true },
+      scrollTrigger: { trigger: section, start: 'top top', end: () => `+=${steps.length * 0.75 * innerHeight}`, pin: true, scrub: true, invalidateOnRefresh: true, refreshPriority: 1 },
     });
     tl.fromTo(arc, { rotation: -62 }, { rotation: 62, ease: 'none', duration: steps.length }, 0);
     tl.fromTo(sun, { rotation: 62 }, { rotation: -62, ease: 'none', duration: steps.length }, 0);
@@ -425,6 +579,25 @@
   }
 
   // ------------------------------------------- no animation required
+
+  // Button and nav labels roll up to a fresh copy on hover (the copy is hidden from screen readers)
+  function rollingLabels() {
+    $$('.btn__label:not([data-submit-label]), .nav__link').forEach((el) => {
+      if (el.querySelector('.roll') || el.children.length) return;
+      const text = el.textContent;
+      const a = d.createElement('span');
+      a.className = 'roll__a';
+      a.textContent = text;
+      const b = d.createElement('span');
+      b.className = 'roll__b';
+      b.setAttribute('aria-hidden', 'true');
+      b.textContent = text;
+      const wrap = d.createElement('span');
+      wrap.className = 'roll';
+      wrap.append(a, b);
+      el.replaceChildren(wrap);
+    });
+  }
 
   function initHeader() {
     const header = $('[data-header]');

@@ -233,7 +233,7 @@ function footer(ctx, page) {
     .map((s) => `<li><a href="/services/${s.slug}/">${esc(s.name)}</a></li>`)
     .join('');
   return `<footer class="site-footer${showCta ? '' : ' site-footer--compact'}">
-  ${showCta ? `<div class="footer-cta container">
+  ${showCta ? `<div class="footer-cta container" data-sunlight>
     <p class="footer-cta__eyebrow eyebrow">Ready when you are</p>
     <h2 class="footer-cta__title" data-split>Let’s bring care <em>home.</em></h2>
     <div class="footer-cta__actions">
@@ -329,7 +329,7 @@ export function pageHero({ eyebrow, title, lead, crumbs = [], image, imageAlt, a
 
 export function ctaBand({ title = 'Questions about care? <em>We’re here.</em>', text = 'Talk with our intake team about services, insurance and getting started. We will guide you through every step.' } = {}) {
   return `<section class="cta-band">
-  <div class="container cta-band__inner">
+  <div class="container cta-band__inner" data-sunlight>
     <div class="cta-band__glow" aria-hidden="true"></div>
     <h2 class="cta-band__title" data-split>${title}</h2>
     <p class="cta-band__text" data-reveal>${text}</p>

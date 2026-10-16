@@ -8,7 +8,7 @@ It's a static site with a tiny build step (plain Node, no framework), hosted on 
 
 | Page | Highlights |
 | --- | --- |
-| **Home** `/` | Sunrise hero: the logo's rays fan open around an arched photo and rotate as you scroll. Paragraph that "lights up" word by word. Counting stats. Pinned **horizontal scroll** of all ten services. Giant words that slide sideways in opposite directions. Sticky stacking value cards. Full bleed photo that opens up as it scrolls in. Pinned "how care begins" section where the sun arcs across the sky through four steps. Insurance partners, testimonials that glide sideways, physician referral block, FAQ |
+| **Home** `/` | Hero photo that rises in through a circular "sunrise" reveal, tilts in 3D toward the pointer, with a warm glow that follows the cursor. Paragraph that "lights up" word by word. Counting stats. Pinned **horizontal scroll** of all ten services (cards lean with scroll speed). Giant words that run like a ticker **only while you scroll**, in opposite directions, reversing when you scroll up and leaning with speed. Value cards that stack and tip back in 3D. Full bleed photo that opens up as it scrolls in. Pinned "how care begins" section where the sun arcs across the sky through four steps. Insurance partners, testimonials that glide sideways, physician referral block, FAQ |
 | **Services** `/services/` | Every service as a large row; a photo follows the pointer on hover |
 | **Service pages** `/services/<name>/` | One page per service (10 total) with what's included, who it helps, how to start, related services |
 | **About** `/about/` | Story, numbers, values, team roles, office and communities served |
@@ -16,6 +16,8 @@ It's a static site with a tiny build step (plain Node, no framework), hosted on 
 | **FAQ** `/faq/` | Ten questions, marked up for Google's FAQ results |
 | **Contact** `/contact/` | Accessible form (works with or without JavaScript), phone, fax, email, address |
 | **Privacy**, **Accessibility**, **404**, **Thanks** | Supporting pages |
+
+Everywhere: photos open with a sunrise reveal, headings rise in with a soft blur, button and menu labels roll on hover, buttons are magnetic, and moving between pages plays a sunrise wipe (in browsers that support view transitions).
 
 Footer on every page: big gradient wordmark, contact details, license number, `© <current year>` (updates itself every January) and **Designed by TENELEVENMEDIA** linking to tenelevenmedia.com.
 

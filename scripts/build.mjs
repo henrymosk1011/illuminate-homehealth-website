@@ -38,14 +38,8 @@ const ctx = {
 };
 const updated = now.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric', timeZone: 'America/Los_Angeles' });
 
-// Logo mark paths, inlined in the home hero so each ray can animate
-const markSvg = readFileSync(join(site, 'assets/img/mark.svg'), 'utf8');
-const paths = [...markSvg.matchAll(/<path[^>]*?fill="([^"]+)"[^>]*?d="([^"]+)"/g)].map((m) => ({ fill: m[1], d: m[2] }));
-if (paths.length !== 9) throw new Error(`Expected 9 paths in mark.svg, found ${paths.length}`);
-const mark = { rays: paths.slice(0, 7), sun: paths[7], hand: paths[8] };
-
 const pages = [
-  home({ mark }),
+  home(),
   servicesIndex(),
   ...SERVICES.map((s, i) => servicePage(s, i)),
   about(),

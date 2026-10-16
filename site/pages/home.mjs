@@ -1,16 +1,14 @@
 import { SITE, SERVICES, STATS, VALUES, STEPS, TESTIMONIALS, FAQS } from '../content/site.mjs';
 import { picture, icon, sun, esc, serviceCard, faqList, businessSchema, websiteSchema } from '../templates/layout.mjs';
 
-export default function home({ mark }) {
-  const rays = mark.rays.map((r, i) => `<path class="ray ray--${i}" fill="${r.fill}" fill-rule="evenodd" d="${r.d}"/>`).join('');
-  const heroMark = `<svg viewBox="10 4 248 160" focusable="false"><g class="hero-rays">${rays}</g><path class="sun-core" fill="${mark.sun.fill}" fill-rule="evenodd" d="${mark.sun.d}"/></svg>`;
+export default function home() {
 
   const words = ['Skilled Nursing', 'Physical Therapy', 'Speech Therapy', 'Occupational Therapy', 'Home Health Aides'];
   const words2 = ['Compassion', 'Dignity', 'Respect', 'Love', 'Responsibility'];
   const row = (list) => list.map((w) => `<span class="bigtype__item">${w}${sun()}</span>`).join('');
 
   const body = `
-<section class="hero" data-hero>
+<section class="hero" data-hero data-sunlight>
   <div class="hero__glow" aria-hidden="true" data-hero-glow></div>
   <div class="container hero__grid">
     <div class="hero__copy">
@@ -28,8 +26,7 @@ export default function home({ mark }) {
       </ul>
     </div>
     <div class="hero__visual">
-      <div class="hero__mark" aria-hidden="true" data-hero-mark>${heroMark}</div>
-      <div class="hero__arch" data-hero-arch>
+      <div class="hero__media" data-hero-media>
         ${picture('hero-care', 'A caregiver checks on an older man resting comfortably in bed at home', { sizes: '(min-width: 960px) 40vw, 86vw', priority: true })}
       </div>
       <div class="hero__badge" aria-hidden="true" data-hero-in>

@@ -1,0 +1,20 @@
+{
+  "name": "illuminate-homehealth-website",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Website for Illuminate Home Health Care, Inc. Static site on Cloudflare Workers with a Resend powered contact form.",
+  "type": "module",
+  "engines": {
+    "node": ">=20.11"
+  },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "check": "node scripts/check.mjs",
+    "dev": "node scripts/build.mjs && node scripts/serve.mjs",
+    "preview:worker": "node scripts/build.mjs && wrangler dev",
+    "deploy": "node scripts/build.mjs && wrangler deploy"
+  },
+  "devDependencies": {
+    "wrangler": "^4.42.0"
+  }
+}

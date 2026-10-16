@@ -1,0 +1,35 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "illuminate-homehealth",
+  "main": "src/worker.js",
+  "compatibility_date": "2026-10-01",
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "run_worker_first": true,
+    "html_handling": "auto-trailing-slash",
+    "not_found_handling": "404-page"
+  },
+  "vars": {
+    "CONTACT_TO": "contact@illuminatehomehealth.com",
+    // The sending domain must be verified in Resend before the form can deliver mail.
+    "CONTACT_FROM": "Illuminate Website <website@forms.illuminatehomehealth.com>",
+    "ALLOWED_ORIGINS": "https://www.illuminatehomehealth.com,https://illuminatehomehealth.com",
+    "CANONICAL_HOST": "www.illuminatehomehealth.com"
+  },
+  "ratelimits": [
+    {
+      "name": "CONTACT_LIMITER",
+      "namespace_id": "1301",
+      "simple": { "limit": 5, "period": 60 }
+    }
+  ],
+  "observability": { "enabled": true },
+  "workers_dev": true,
+  "preview_urls": true
+  // Uncomment once illuminatehomehealth.com is active in Cloudflare (nameservers moved from GoDaddy):
+  // "routes": [
+  //   { "pattern": "www.illuminatehomehealth.com", "custom_domain": true },
+  //   { "pattern": "illuminatehomehealth.com", "custom_domain": true }
+  // ]
+}

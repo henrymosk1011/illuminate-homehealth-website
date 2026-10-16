@@ -375,11 +375,19 @@
       gsap.fromTo(img, { xPercent: -6 }, { xPercent: 6, ease: 'none', force3D: true, scrollTrigger: { trigger: img.closest('.hsec__item'), containerAnimation: tween, start: 'left right', end: 'right left', scrub: true } });
     });
 
-    // Keyboard users: bring a focused card into view
+    // Keyboard users: bring a focused card into view. Mouse and touch focus is left alone,
+    // otherwise the track jumps between press and release and the click lands on another card.
+    const fromKeyboard = (el) => {
+      try {
+        return el.matches(':focus-visible');
+      } catch {
+        return true;
+      }
+    };
     const onFocus = (e) => {
       const item = e.target.closest('.hsec__item');
       const st = tween.scrollTrigger;
-      if (!item || !st) return;
+      if (!item || !st || !fromKeyboard(e.target)) return;
       const left = item.offsetLeft - parseFloat(getComputedStyle(track).paddingLeft || 0);
       const progress = Math.min(1, Math.max(0, left / distance()));
       scrollTo({ top: st.start + progress * (st.end - st.start), behavior: 'instant' });

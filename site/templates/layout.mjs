@@ -276,7 +276,7 @@ function footer(ctx, page) {
     <ul class="footer-legal">
       <li><a href="/privacy/">Privacy Policy</a></li>
       <li><a href="/accessibility/">Accessibility</a></li>
-      <li><a class="credit" href="${SITE.designer.url}" target="_blank" rel="noopener">Designed by <strong>${SITE.designer.name}</strong>${newTab}</a></li>
+      <li class="credit">Designed by <a href="${SITE.designer.url}" target="_blank" rel="noopener"><strong>${SITE.designer.name}</strong>${newTab}</a></li>
     </ul>
   </div>
 </footer>`;

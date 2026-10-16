@@ -142,7 +142,7 @@ These came from the old Webflow site or are reasonable assumptions; worth a quic
 
 ## Image credits
 
-Photos are from Illuminate's existing Webflow library and from [Unsplash](https://unsplash.com/license) (free for commercial use): Age Cymru (nurse, walker, coloring, laughing, dancing, two women), Vitaly Gariev (clinician visits, consultations, family exercise), Miles Burke (pill organizer). Logo vectorized from the original artwork.
+Photos are from Illuminate's existing Webflow library and from [Unsplash](https://unsplash.com/license) (free for commercial use): Age Cymru (nurse, walker, coloring, laughing, dancing, two women, speech therapy conversation), Vitaly Gariev (clinician visits, consultations, family exercise), Miles Burke (pill organizer). Logo vectorized from the original artwork.
 
 GSAP 3.13 (with ScrollTrigger and SplitText) is self hosted under the [GSAP standard license](https://gsap.com/standard-license), free for commercial sites.
 

@@ -1,5 +1,6 @@
 import { SITE, NAV, SERVICES } from '../content/site.mjs';
 import { readFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 
 const photos = JSON.parse(readFileSync(new URL('../assets/img/photos.json', import.meta.url)));
 
@@ -15,13 +16,24 @@ export const fullAddress = () => {
   return `${a.street}, ${a.city}, ${a.region} ${a.zip}`;
 };
 
+// Photo URLs carry a short hash of the file, so a replaced photo is never served from an old cache
+const photoHashes = new Map();
+export function photoUrl(name, w, ext) {
+  const file = `${name}-${w}.${ext}`;
+  if (!photoHashes.has(file)) {
+    const bytes = readFileSync(new URL(`../assets/img/photos/${file}`, import.meta.url));
+    photoHashes.set(file, createHash('sha256').update(bytes).digest('hex').slice(0, 8));
+  }
+  return `/assets/img/photos/${file}?v=${photoHashes.get(file)}`;
+}
+
 // <picture> with AVIF and WebP sources built from assets/img/photos.json
 export function picture(name, alt, { sizes = '100vw', cls = '', imgCls = '', priority = false, decorative = false } = {}) {
   const p = photos[name];
   if (!p) throw new Error(`Unknown photo "${name}"`);
-  const set = (ext) => p.widths.map((w) => `/assets/img/photos/${name}-${w}.${ext} ${w}w`).join(', ');
+  const set = (ext) => photoSrcset(name, ext);
   const largest = p.widths[p.widths.length - 1];
-  const fallback = `/assets/img/photos/${name}-${p.widths[Math.min(1, p.widths.length - 1)]}.webp`;
+  const fallback = photoUrl(name, p.widths[Math.min(1, p.widths.length - 1)], 'webp');
   const h = Math.round(largest / p.ratio);
   const altAttr = decorative ? 'alt="" aria-hidden="true"' : `alt="${esc(alt)}"`;
   const load = priority ? 'fetchpriority="high" loading="eager"' : 'loading="lazy"';
@@ -29,7 +41,7 @@ export function picture(name, alt, { sizes = '100vw', cls = '', imgCls = '', pri
 }
 
 export const photoSrcset = (name, ext) =>
-  photos[name].widths.map((w) => `/assets/img/photos/${name}-${w}.${ext} ${w}w`).join(', ');
+  photos[name].widths.map((w) => `${photoUrl(name, w, ext)} ${w}w`).join(', ');
 
 const ICONS = {
   arrow: '<path d="M5 12h14M13 6l6 6-6 6"/>',

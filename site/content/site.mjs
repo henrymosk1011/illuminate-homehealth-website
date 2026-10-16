@@ -258,7 +258,7 @@ export const SERVICES = [
     slug: 'speech-therapy',
     name: 'Speech Therapy',
     image: 'speech-therapy',
-    alt: 'A therapist in a bright room listens closely to an older woman as she speaks',
+    alt: 'A smiling therapist in green scrubs leans in to talk with an older woman',
     short: 'Targeted therapy that restores communication, cognition and safe swallowing.',
     lead: 'Targeted therapies that improve communication, cognition and swallowing, for a fuller and safer quality of life at home.',
     body: [

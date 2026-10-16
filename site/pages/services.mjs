@@ -1,5 +1,5 @@
 import { SITE, SERVICES, STEPS } from '../content/site.mjs';
-import { picture, icon, esc, pageHero, ctaBand, serviceCard, breadcrumbSchema, businessSchema, emailHtml } from '../templates/layout.mjs';
+import { picture, photoUrl, icon, esc, pageHero, ctaBand, serviceCard, breadcrumbSchema, businessSchema, emailHtml } from '../templates/layout.mjs';
 
 export function servicesIndex() {
   const rows = SERVICES.map(
@@ -13,7 +13,7 @@ export function servicesIndex() {
   </li>`,
   ).join('');
 
-  const previews = SERVICES.map((s) => `<img src="/assets/img/photos/${s.image}-640.webp" alt="" data-preview-img="${s.image}" width="640" height="800" loading="lazy">`).join('');
+  const previews = SERVICES.map((s) => `<img src="${photoUrl(s.image, 640, 'webp')}" alt="" data-preview-img="${s.image}" width="640" height="800" loading="lazy">`).join('');
 
   const body = `
 ${pageHero({

@@ -51,14 +51,14 @@
   "ratio": 1.4144
  },
  "speech-therapy": {
-  "w": 2000,
-  "h": 1125,
+  "w": 4961,
+  "h": 3508,
   "widths": [
    640,
    1024,
    1600
   ],
-  "ratio": 1.7778
+  "ratio": 1.4142
  },
  "social-services": {
   "w": 2000,

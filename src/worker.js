@@ -109,6 +109,8 @@ function withSiteHeaders(response, url) {
   } else if (type.includes('text/html')) {
     headers.set('Cache-Control', 'public, max-age=0, must-revalidate');
   }
+  // Keep preview URLs out of search results; only the real domain should be indexed.
+  if (url.hostname.endsWith('.workers.dev')) headers.set('X-Robots-Tag', 'noindex, nofollow');
   return new Response(response.body, { status: response.status, statusText: response.statusText, headers });
 }
 

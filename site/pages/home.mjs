@@ -30,7 +30,7 @@ export default function home() {
         ${picture('hero-care', 'A caregiver checks on an older man resting comfortably in bed at home', { sizes: '(min-width: 960px) 40vw, 86vw', priority: true })}
       </div>
       <div class="hero__badge" aria-hidden="true" data-hero-in>
-        <svg class="badge-ring" viewBox="0 0 100 100" data-badge-ring><defs><path id="badge-circle" d="M50 50m-40 0a40 40 0 1 1 80 0a40 40 0 1 1-80 0"/></defs><text><textPath href="#badge-circle" textLength="250" lengthAdjust="spacing">Illuminate Home Health ✦ Los Angeles ✦</textPath></text></svg>
+        <svg class="badge-ring" viewBox="0 0 200 200" data-badge-ring><defs><path id="badge-circle" d="M100 100m-80 0a80 80 0 1 1 160 0a80 80 0 1 1-160 0"/></defs><text><textPath href="#badge-circle" textLength="500" lengthAdjust="spacing">Illuminate Home Health ✦ Los Angeles ✦</textPath></text></svg>
         ${sun()}
       </div>
     </div>
@@ -117,9 +117,9 @@ export default function home() {
 <section class="band" data-band aria-labelledby="band-quote">
   <div class="band__media" data-band-media>
     ${picture('woman-smiling', 'An older woman smiles warmly in a sunlit room', { sizes: '100vw' })}
-  </div>
-  <div class="band__copy">
-    <p class="band__quote" id="band-quote" data-split>Every patient deserves to feel seen, safe and <em>at home.</em></p>
+    <div class="band__copy">
+      <p class="band__quote" id="band-quote" data-split>Every patient deserves to feel seen, safe and <em>at home.</em></p>
+    </div>
   </div>
 </section>
 

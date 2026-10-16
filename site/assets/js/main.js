@@ -150,34 +150,39 @@
     };
   }
 
-  // A warm pool of light follows the pointer across the hero and the call to action panels
+  // The logo's sun (rays and all) glows softly behind the hero and the call to action
+  // panels and follows the pointer. Its rays turn as the pointer moves sideways.
   function sunlight() {
     const undo = [];
     $$('[data-sunlight]').forEach((zone) => {
       const glow = d.createElement('div');
       glow.className = 'sunlight';
       glow.setAttribute('aria-hidden', 'true');
+      glow.innerHTML = '<svg viewBox="10 4 248 160" focusable="false"><use href="/assets/img/sprite.svg#sun"></use></svg>';
       zone.prepend(glow);
-      gsap.set(glow, { xPercent: -50, yPercent: -50 });
+      // Anchor the center of the sun disc (not the box) on the pointer
+      gsap.set(glow, { xPercent: -49.6, yPercent: -74, transformOrigin: '49.6% 74%', scale: 0.7 });
       const x = gsap.quickTo(glow, 'x', { duration: 1.1, ease: 'expo.out' });
       const y = gsap.quickTo(glow, 'y', { duration: 1.1, ease: 'expo.out' });
+      const turn = gsap.quickTo(glow, 'rotation', { duration: 1.6, ease: 'expo.out' });
       const pos = (e) => {
         const r = zone.getBoundingClientRect();
-        return [e.clientX - r.left, e.clientY - r.top];
+        return [e.clientX - r.left, e.clientY - r.top, (e.clientX - r.left) / r.width];
       };
       const enter = (e) => {
         const [px, py] = pos(e);
         gsap.set(glow, { x: px, y: py });
         x(px);
         y(py);
-        gsap.to(glow, { opacity: 1, duration: 0.9, overwrite: 'auto' });
+        gsap.to(glow, { opacity: 1, scale: 1, duration: 1.1, ease: 'expo.out', overwrite: 'auto' });
       };
       const move = (e) => {
-        const [px, py] = pos(e);
+        const [px, py, fx] = pos(e);
         x(px);
         y(py);
+        turn((fx - 0.5) * 50);
       };
-      const leave = () => gsap.to(glow, { opacity: 0, duration: 1.2, overwrite: 'auto' });
+      const leave = () => gsap.to(glow, { opacity: 0, scale: 0.7, duration: 1.2, ease: 'power2.out', overwrite: 'auto' });
       zone.addEventListener('pointerenter', enter);
       zone.addEventListener('pointermove', move);
       zone.addEventListener('pointerleave', leave);
@@ -325,49 +330,49 @@
     section.classList.add('is-pinned');
 
     const distance = () => Math.max(0, track.scrollWidth - root.clientWidth);
+    let shown = -1;
     const tween = gsap.to(track, {
       x: () => -distance(),
       ease: 'none',
+      force3D: true,
       scrollTrigger: {
         trigger: pin,
         start: 'top top',
-        end: () => `+=${distance()}`,
+        end: () => `+=${distance() * 0.9}`,
         pin: true,
-        scrub: true,
+        // A short catch up evens out mouse wheel steps so the cards glide instead of jumping
+        scrub: 0.6,
+        anticipatePin: 1,
         invalidateOnRefresh: true,
         // Pinned sections add scroll space, so measure them before everything below them
         refreshPriority: 2,
         onUpdate: (self) => {
           if (bar) bar.style.transform = `scaleX(${0.06 + self.progress * 0.94})`;
-          if (count) {
-            const i = Math.min(items.length - 1, Math.floor(self.progress * items.length));
-            count.textContent = String(Math.min(i + 1, items.length - 1)).padStart(2, '0');
+          const i = Math.min(items.length - 2, Math.floor(self.progress * (items.length - 1)));
+          if (count && i !== shown) {
+            shown = i;
+            count.textContent = String(i + 1).padStart(2, '0');
           }
         },
       },
     });
 
-    // Cards lean into the direction of travel when you scroll fast, then settle
-    const cards = $$('.svc-card, .svc-end', track);
-    const setSkew = gsap.quickSetter(cards, 'skewX', 'deg');
-    const lean = { v: 0 };
-    const clampLean = gsap.utils.clamp(-7, 7);
+    // Load and decode every card photo before the section arrives, so none pops in mid scroll
+    const imgs = $$('img', track);
     ScrollTrigger.create({
-      trigger: pin,
-      start: () => tween.scrollTrigger.start,
-      end: () => tween.scrollTrigger.end,
-      onUpdate: (self) => {
-        const v = clampLean(self.getVelocity() / -260);
-        if (Math.abs(v) > Math.abs(lean.v)) {
-          lean.v = v;
-          gsap.to(lean, { v: 0, duration: 0.9, ease: 'power3.out', overwrite: true, onUpdate: () => setSkew(lean.v) });
-        }
-      },
+      trigger: section,
+      start: 'top bottom+=1200',
+      once: true,
+      onEnter: () =>
+        imgs.forEach((img) => {
+          img.loading = 'eager';
+          if (img.decode) img.decode().catch(() => {});
+        }),
     });
 
     // Photos drift inside their frames as the cards pass
     $$('.svc-card__media img', track).forEach((img) => {
-      gsap.fromTo(img, { xPercent: -7 }, { xPercent: 7, ease: 'none', scrollTrigger: { trigger: img.closest('.hsec__item'), containerAnimation: tween, start: 'left right', end: 'right left', scrub: true } });
+      gsap.fromTo(img, { xPercent: -6 }, { xPercent: 6, ease: 'none', force3D: true, scrollTrigger: { trigger: img.closest('.hsec__item'), containerAnimation: tween, start: 'left right', end: 'right left', scrub: true } });
     });
 
     // Keyboard users: bring a focused card into view

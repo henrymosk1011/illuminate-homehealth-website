@@ -137,7 +137,7 @@ These came from the old Webflow site or are reasonable assumptions; worth a quic
 - **Testimonials** (Martha J., John W., Sabina M.): confirm they're real patient quotes and that the patients are OK being quoted. Remove any that aren't.
 - **Numbers:** 400+ patients, 10+ years, 20+ staff (from the old About page).
 - **Service areas** listed on the About page.
-- **Insurance partners:** Blue Shield of California, UnitedHealthcare, Carelon.
+- **Insurance partners:** UnitedHealthcare and Carelon.
 - **Fax:** (818) 235 0135. **License:** 550005596.
 
 ## Image credits

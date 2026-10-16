@@ -43,7 +43,6 @@ export const SITE = {
     'Los Angeles',
   ],
   insurers: [
-    { name: 'Blue Shield of California', logo: '/assets/img/insurers/blue-shield.webp', w: 215, h: 83 },
     { name: 'UnitedHealthcare', logo: '/assets/img/insurers/unitedhealthcare.webp', w: 606, h: 186 },
     { name: 'Carelon', logo: '/assets/img/insurers/carelon.webp', w: 998, h: 256 },
   ],
@@ -141,7 +140,7 @@ export const FAQS = [
   },
   {
     q: 'What insurance plans do you accept?',
-    a: 'We work with most major insurance providers, including Blue Shield of California, UnitedHealthcare and Carelon. Contact us and we will verify your coverage and explain your benefits before care begins.',
+    a: 'We work with most major insurance providers, including UnitedHealthcare and Carelon. Contact us and we will verify your coverage and explain your benefits before care begins.',
   },
   {
     q: 'Do I need a referral from my doctor?',

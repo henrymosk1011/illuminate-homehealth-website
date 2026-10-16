@@ -294,8 +294,11 @@
       const tl = gsap.timeline({ scrollTrigger: { trigger: el, start: 'top 88%', once: true } });
       // Photos open like a sunrise: a circle growing up from the bottom edge
       tl.fromTo(el, { clipPath: 'circle(0% at 50% 100%)' }, { clipPath: 'circle(150% at 50% 100%)', duration: 1.7, ease: 'expo.inOut', clearProps: 'clipPath' });
-      if (img) tl.from(img, { scale: 1.35, duration: 2.2, ease: 'expo.out' }, 0);
-      if (img) gsap.to(img, { yPercent: 6, ease: 'none', scrollTrigger: { trigger: el, start: 'top bottom', end: 'bottom top', scrub: true } });
+      if (!img) return;
+      // The photo rests a little larger than its frame, so the scroll drift never uncovers an edge
+      gsap.set(img, { scale: 1.12 });
+      tl.from(img, { scale: 1.4, duration: 2.2, ease: 'expo.out' }, 0);
+      gsap.fromTo(img, { yPercent: -4 }, { yPercent: 4, ease: 'none', scrollTrigger: { trigger: el, start: 'top bottom', end: 'bottom top', scrub: true } });
     });
   }
 

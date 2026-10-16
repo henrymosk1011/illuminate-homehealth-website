@@ -748,6 +748,8 @@ button:focus-visible .roll__b {
   aspect-ratio: 248 / 160;
   pointer-events: none;
   opacity: 0;
+  /* Own layer: the heavy blur is drawn once, then simply moved */
+  will-change: transform, opacity;
 }
 .sunlight::before {
   content: '';
@@ -766,8 +768,8 @@ button:focus-visible .roll__b {
   width: 100%;
   height: 100%;
   overflow: visible;
-  opacity: 0.3;
-  filter: blur(5px) drop-shadow(0 0 24px rgba(248, 152, 28, 0.9));
+  opacity: 0.42;
+  filter: blur(22px) drop-shadow(0 0 32px rgba(248, 152, 28, 0.9));
 }
 .cta-band__inner > :not(.sunlight):not(.cta-band__glow),
 .footer-cta > :not(.sunlight) {

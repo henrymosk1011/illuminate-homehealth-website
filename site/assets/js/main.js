@@ -70,10 +70,11 @@
 
     mm.add('(prefers-reduced-motion: no-preference) and (hover: hover) and (pointer: fine)', () => {
       magnetic();
-      hoverPreview();
+      const undoPreview = hoverPreview();
       const undoLight = sunlight();
       const undoTilt = heroTilt();
       return () => {
+        undoPreview && undoPreview();
         undoLight && undoLight();
         undoTilt && undoTilt();
       };
@@ -578,20 +579,66 @@
     const x = gsap.quickTo(box, 'x', { duration: 0.7, ease: 'expo.out' });
     const y = gsap.quickTo(box, 'y', { duration: 0.7, ease: 'expo.out' });
     const r = gsap.quickTo(box, 'rotation', { duration: 0.9, ease: 'expo.out' });
+    gsap.set(box, { scale: 0.85 });
+    let px = -1;
+    let py = -1;
     let lastX = 0;
-    addEventListener('pointermove', (e) => {
-      x(e.clientX + 32);
-      y(e.clientY - box.offsetHeight / 2);
-      r(gsap.utils.clamp(-8, 8, (e.clientX - lastX) * 0.4));
-      lastX = e.clientX;
-    });
-    $$('[data-preview]').forEach((row) => {
-      row.addEventListener('pointerenter', () => {
-        imgs.forEach((im) => im.classList.toggle('is-active', im.dataset.previewImg === row.dataset.preview));
-        gsap.to(box, { autoAlpha: 1, scale: 1, duration: 0.5, ease: 'expo.out' });
-      });
-      row.addEventListener('pointerleave', () => gsap.to(box, { autoAlpha: 0, scale: 0.85, duration: 0.4, ease: 'power2.out' }));
-    });
+    let current = null;
+    let queued = false;
+
+    const show = (row) => {
+      if (row === current) return;
+      const appearing = !current;
+      current = row;
+      if (!row) {
+        gsap.to(box, { autoAlpha: 0, scale: 0.85, duration: 0.3, ease: 'power2.out', overwrite: 'auto' });
+        return;
+      }
+      imgs.forEach((im) => im.classList.toggle('is-active', im.dataset.previewImg === row.dataset.preview));
+      if (appearing) {
+        // Start right at the pointer instead of gliding over from wherever it was last seen
+        x(px + 32, px + 32);
+        y(py - box.offsetHeight / 2, py - box.offsetHeight / 2);
+      }
+      gsap.to(box, { autoAlpha: 1, scale: 1, duration: 0.5, ease: 'expo.out', overwrite: 'auto' });
+    };
+
+    // Rows slide under a still pointer while the page scrolls, and browsers send enter and leave
+    // events late or not at all then. So look up the row under the pointer on every move and scroll.
+    const check = () => {
+      queued = false;
+      const el = px < 0 ? null : d.elementFromPoint(px, py);
+      show(el ? el.closest('[data-preview]') : null);
+    };
+    const queue = () => {
+      if (queued) return;
+      queued = true;
+      requestAnimationFrame(check);
+    };
+    const onMove = (e) => {
+      px = e.clientX;
+      py = e.clientY;
+      x(px + 32);
+      y(py - box.offsetHeight / 2);
+      r(gsap.utils.clamp(-8, 8, (px - lastX) * 0.4));
+      lastX = px;
+      queue();
+    };
+    const away = () => {
+      px = -1;
+      show(null);
+    };
+    addEventListener('pointermove', onMove, { passive: true });
+    addEventListener('scroll', queue, { passive: true });
+    root.addEventListener('pointerleave', away);
+    addEventListener('blur', away);
+
+    return () => {
+      removeEventListener('pointermove', onMove);
+      removeEventListener('scroll', queue);
+      root.removeEventListener('pointerleave', away);
+      removeEventListener('blur', away);
+    };
   }
 
   // ------------------------------------------- no animation required

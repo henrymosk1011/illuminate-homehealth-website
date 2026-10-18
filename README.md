@@ -82,12 +82,16 @@ The domain stays registered at GoDaddy. Only the DNS moves to Cloudflare.
 | `TXT` @ and `_webflow` | Google and Webflow verification | |
 | `CNAME` `pay`, `_domainconnect` | GoDaddy | |
 
-Steps to switch:
+Steps to switch (do them before **November 13, 2026**: Cloudflare deletes free zones that stay pending for 28 days):
 
-1. **Double check** Cloudflare → illuminatehomehealth.com → DNS → Records against GoDaddy's DNS page. If GoDaddy shows any record not in the table above (for example a DMARC `_dmarc` record or another DKIM key added later), add it in Cloudflare first.
-2. **GoDaddy → My Products → illuminatehomehealth.com → DNS → Nameservers → Change → "I'll use my own nameservers"** and enter `kira.ns.cloudflare.com` and `viddy.ns.cloudflare.com`.
-3. Wait for Cloudflare to show the domain as **Active** (usually under an hour, sometimes up to 24). The Webflow site and email keep working the whole time.
-4. **Go live:** in `wrangler.jsonc`, uncomment the `routes` block for `www.illuminatehomehealth.com` and `illuminatehomehealth.com` and push to `main`. (Or Cloudflare dashboard → Workers → illuminate-homehealth → Settings → Domains → Add custom domain, for both names; remove the old Webflow `A` and `www` records if Cloudflare asks.) SSL certificates are issued automatically.
+1. **Double check** Cloudflare → illuminatehomehealth.com → DNS → Records against GoDaddy's DNS page. If GoDaddy shows any record not in the table above (for example a DMARC `_dmarc` record or another DKIM key added later), add it in Cloudflare first. DNSSEC is off at GoDaddy, so there is nothing to disable.
+2. **GoDaddy → Domain Portfolio → illuminatehomehealth.com → DNS → Nameservers → Change Nameservers → "I'll use my own nameservers"**, enter `kira.ns.cloudflare.com` and `viddy.ns.cloudflare.com` in place of the two `domaincontrol.com` nameservers, then **Save → Continue** (Domain Protection asks for a verification code).
+3. Wait for Cloudflare to show the domain as **Active** (Overview → **Check nameservers now**; usually under an hour, sometimes up to 24). The Webflow site and email keep working the whole time.
+4. **Go live** (in this order; the site is offline for the minute in between):
+   1. Cloudflare → illuminatehomehealth.com → DNS → Records: delete the two Webflow `A` records on `illuminatehomehealth.com` (`75.2.70.75`, `99.83.190.102`) and the `www` `CNAME` to `proxy-ssl.webflow.com`. Leave the MX, TXT, `pay` and `_domainconnect` records alone. Custom domains cannot be added while these records exist.
+   2. Workers & Pages → illuminate-homehealth → **Domains** → **+ Add Domain**: add `www.illuminatehomehealth.com`, then `illuminatehomehealth.com`. Cloudflare creates the DNS records and SSL certificates.
+   3. In `wrangler.jsonc`, uncomment the `routes` block (the same two custom domains) and push to `main`, so later deploys keep both domains attached. Don't do this before the zone is Active: custom domains need an active zone, so every deploy would fail.
+   4. SSL/TLS → Edge Certificates → **Always Use HTTPS**: on.
 5. Once the new site is live, unpublish the Webflow site and remove its custom domain.
 
 ## Contact form email (Resend)

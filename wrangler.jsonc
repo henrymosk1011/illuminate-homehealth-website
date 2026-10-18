@@ -26,10 +26,11 @@
   ],
   "observability": { "enabled": true },
   "workers_dev": true,
-  "preview_urls": true
-  // Uncomment once illuminatehomehealth.com is active in Cloudflare (nameservers moved from GoDaddy):
-  // "routes": [
-  //   { "pattern": "www.illuminatehomehealth.com", "custom_domain": true },
-  //   { "pattern": "illuminatehomehealth.com", "custom_domain": true }
-  // ]
+  "preview_urls": true,
+  // Both names serve this Worker; src/worker.js redirects the bare domain to www.
+  // Listed here so every deploy keeps them attached.
+  "routes": [
+    { "pattern": "www.illuminatehomehealth.com", "custom_domain": true },
+    { "pattern": "illuminatehomehealth.com", "custom_domain": true }
+  ]
 }

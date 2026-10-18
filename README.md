@@ -58,7 +58,7 @@ npm run check     # house rules + SEO/accessibility checks on the build
 GitHub (main) ──push──▶ Cloudflare Workers Builds ──npm run build──▶ npx wrangler deploy
 ```
 
-The Cloudflare project is the Worker **`illuminate-homehealth`**, connected to this repository through Workers Builds (trigger "Production (main)"). Every push to `main` builds the site into `dist/` and deploys it. Until the custom domain is attached, the site is live at **https://illuminate-homehealth.henrymm.workers.dev**.
+The Cloudflare project is the Worker **`illuminate-homehealth`**, connected to this repository through Workers Builds (trigger "Production (main)"). Every push to `main` builds the site into `dist/` and deploys it. The site is live at **https://www.illuminatehomehealth.com** (the bare domain redirects there). The preview copy at https://illuminate-homehealth.henrymm.workers.dev stays up and is kept out of search results.
 
 To redeploy another branch by hand: Cloudflare dashboard → Workers → illuminate-homehealth → Deployments (or Builds) → run a build and pick the branch. Configuration is in `wrangler.jsonc`:
 
@@ -68,9 +68,9 @@ To redeploy another branch by hand: Cloudflare dashboard → Workers → illumin
 
 ## Moving the domain from GoDaddy to Cloudflare
 
-The domain stays registered at GoDaddy. Only the DNS moves to Cloudflare.
+**Done October 18, 2026.** The steps below are kept for reference. The domain stays registered at GoDaddy (keep auto renew on there); only the DNS moved to Cloudflare.
 
-`illuminatehomehealth.com` has already been added to the Cloudflare account (status: pending) with every current record copied over:
+`illuminatehomehealth.com` was added to the Cloudflare account with every GoDaddy record copied over (the Webflow `A` and `www` records were removed at go live):
 
 | Record | Points to | Notes |
 | --- | --- | --- |

@@ -15,4 +15,10 @@ Website for Illuminate Home Health Care. See `README.md` for how the build, depl
 npm run build && npm run check
 ```
 
-`check` must report 0 errors. Then load the site with `npm run dev` and confirm the change renders with no console errors. Pushes to `main` deploy to production through Cloudflare Workers Builds.
+`check` must report 0 errors. Then load the site with `npm run dev` and confirm the change renders with no console errors.
+
+## Shipping changes
+
+Push finished, checked changes straight to `main`. Don't open a pull request or ask first. `main` is the production branch: the site is live at https://www.illuminatehomehealth.com, and pushes to `main` deploy through Cloudflare Workers Builds (Worker `illuminate-homehealth`, trigger "Production (main)").
+
+After pushing, confirm a production build ran and succeeded (Cloudflare → Workers & Pages → illuminate-homehealth → Deployments). If no build started, start one on `main` by hand, then check the live site.
